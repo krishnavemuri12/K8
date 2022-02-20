@@ -1,0 +1,23 @@
+##Cloud Build 
+
+gcloud services enable <service-name> -- to enable the API
+-----------------------------------------------------
+Create a sample dockerfile -- vim Dockerfile
+FROM ubuntu:latest
+#
+# Update the image to the latest packages
+RUN apt-get update && apt-get upgrade -y
+#
+# Install NGINX to test.
+RUN apt-get install nginx -y
+#
+# Expose port 80
+EXPOSE 80
+#
+# Last is the actual command to start up NGINX within our Container
+CMD ["nginx", "-g", "daemon off;"]
+-------------------------------------------
+In gcloudSDK/shell run the CMD
+gcloud builds submit --tag gcr.io/${GOOGLE_CLOUD_PROJECT}/image_name .
+specify the (".") at the end. The dot specifies that the source is in the current working directory at build time.
+You can see image is created in GCR.
