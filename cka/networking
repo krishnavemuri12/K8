@@ -1,0 +1,9 @@
+handy n/w cmds 
+  ip link - list and modify interfaces on the host.
+  ip addr - to see the ip addresses assigned to those interaces.
+  ip addr add - is used to set ip address on the interfaces (valid till upto restart)
+  ip route/route - see the routing table
+  tp route add - to add in routing table.
+
+  nslookup  - to query a hostname from DNS server
+  dig       - to test dns name resolution
