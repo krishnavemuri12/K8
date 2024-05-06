@@ -1,0 +1,30 @@
+
+git clone https://github.com/spring-projects/spring-petclinic.git
+
+need java 17
+
+go to the folder and run "mvn package" - a new target folder will be created which has jar in it
+
+create container from ubuntu image with specifying port
+
+    docker run -it --name spring -p 8082:8080 ubuntu
+
+through docker cp - copy jar to container
+
+    docker cp <jar> <containerd:/>
+
+in the container run java -jar <jar-name>
+
+    application will start, check logs 
+
+    ip-addr:8082 
+
+to push the new image to Google artifact registry
+
+    need to authenticate
+
+    docker tag sourceimage:tag destination
+    docker push destination
+
+    https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling#tag
+

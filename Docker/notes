@@ -1,0 +1,299 @@
+https://github-com.translate.goog/etxahun/docker-notes?_x_tr_sl=es&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=scdoccker cli
+
+https://github.com/iam-veeramalla/Docker-Zero-to-Hero
+
+
+
+docker <docker-objects> <sub-cmds> <options> <arguments>
+
+docker cmds never be run in production, docker is used only upto image creation
+
+docker pull ==> pulls the image
+
+docker run ==> runs a containers from image ** pulls the image + create and starts the containers
+
+docker ps -- list of containers running state
+
+docker ps -a -- list all the conainters including non-running containers
+
+-d ==> runs in the background.. in a detach mode
+
+to specify a name to the container.
+    docker run -d --name <container_name> <image>
+
+most used commands in real time
+
+    docker login
+    
+    docker pull
+
+    **docker build
+
+    docker tag
+
+    docker push
+
+docker rm <container-id>
+
+----------------------------------------------
+-- there are management commands that are created recently
+
+examples:
+
+docker images ls 
+
+docker containers ls == docker run
+
+-------------------------------------------
+
+
+# with the help of one image we can create multiple containers.
+
+# Containers are meant to run a specific task or a process. once the task/process finishes container will stop it
+
+    examples: to host a webserver, database. 
+
+    container cant host a OS, however we can make it run by adding a process
+    docker run ubuntu sleep 25
+    docker run ubuntu cat /etc/relaese - installs the container using ubuntu image and reads the specified thing
+
+# information about any object (image, container, network, volume etc)
+
+    docker conatiner inspect <contianer-id>
+
+    docker image inspect hello-world:latest
+
+# to copy a file from local to contianer
+
+    docker cp <source_file> <containerid:/path>
+
+##** to connect through a running containers
+    two ways - attach - exec
+
+    Both docker exec and docker attach are used to connect or access the container but only difference is that docker exec creates a differrent process to access the container whereas docker attach connects to the same standard input/out or the same terminal.
+
+    docker exec -it containerd /bin/bash
+
+# Every docker will be having a base image, on that base image you can build layers.. Each layer is dependent on other
+    all are read only template
+
+# docker image can be created in two ways - commit - Dockerfile
+    Dockerfile will only be used in org - mandatory
+
+# Containers are ephimeral, not persistent - no data should not be there on the container level
+
+$ to delete container when ever it goes to stop state, specify it when you run the container
+
+    docker run --rm --name c1 -it ubuntu  --> when we exit the container, with the help of rm it will delete container automatically with out going to stop
+
+    docker run --name c2 -it ubuntu - when exiting the container, it will move to stop state
+
+# you can download image, you can add some properties/process and you can commit new image
+
+    docker run -it --name u1 ubuntu
+
+    after exec to the container install few packages
+
+        apt update -y
+        apt install wget curl net-tools iputils-ping -y
+
+    docker commit cantainerd imagename:tagname
+        ex: docker commit 3a33e486e188 ubuntu:customimage
+            this image will be pushed to your local only - to check docker images
+
+    from newly created image you can create container 
+        docker run -it imagename:tagname
+
+# docker commit - create a image from container
+
+  docker export - create a tarfile from container
+
+  docker import - create a image from tarfile
+
+  docker save - creating a tarfile from image
+
+  docker load - loading a image from tarfile
+
+
+
+Source code ==> build artifact ==> docker package (artifact and dependencies) ==> image ==> container
+
+to delete all the images
+
+    docker rmi -f $(docker images -aq)
+
+
+## docker tag
+
+    if you want to change image name or tage name
+
+        docker image tag imagename:tagname imagename1:tagname1
+
+        example docker image tag krishna:v1 krishna:v2
+                docker image tag krishna:v1 gcr.io/intl-ca/meg:vesrion-1
+
+## docker network
+
+
+By default, Docker provides two network drivers for you, the bridge and the overlay drivers.
+
+        docker network ls
+
+            NETWORK ID          NAME                DRIVER
+            xxxxxxxxxxxx        none                null
+            xxxxxxxxxxxx        host                host
+            xxxxxxxxxxxx        bridge              bridge
+
+    Bridge networking is the defualt network that is attached to a container.
+
+Containers can access with each other using the internal ip address, if they want to access these containers from outside world we need to use port forwading
+
+    docker run -d -it --name webserver -p 8082:8080 httpd
+
+    here 8082 is "host network" - where container is hosted, if it is hosted on VM then 8082 is port of VM
+
+    8080 is "container network"
+
+    -p is small p 
+
+    -P takes default container network mentioned in the image and host network gets randomnly
+
+to create a new network
+
+    docker network create <name>
+
+to run container from diff network specify the networtk tag
+
+    docker run -it --name=<name> --network=<name> <imgname>
+
+you can also specify the subnet range you want to mention by using flag --subnet
+
+to connect a container to a different network we can do it by docker ntwork commands, then the container will have two ip address in each network
+
+ docker network connect <networkname> <contianrname>
+
+
+host network - when you specify network as host, container will not create any host - container host will same as host network
+
+
+## docker volumes
+
+It is a very common requirement to persist the data in a Docker container beyond the lifetime of the container. However, the file system of a Docker container is deleted/removed when the container dies.
+
+3 ways to sove this issue
+
+    1 - bind host  in k8 - hostPath
+
+    2 - TempFS in K8 - emptyDIR
+
+    3 - docker volume in K8 pv,pvc, storage class
+
+
+bind host: A file or directly can host on the host path that directory or file can be mounted on the container.
+    it has a limitation - that it works only if we host containers in one host (vm). for multiple host it s hard to define
+
+tempFS: It stores the data in the RAM, instead of ROM
+
+docker volume: home dir /var/lib/docker
+
+docker run -it --name=<name> -v <hostpath>:<containerpath> <imagename>
+
+
+## Dockerfile
+
+instructions are written by user to execute which creates the image
+
+flow tha
+
+docker file ====> Imgae ====> namechange =====> registry ====> deploy to container (in real time on k8)
+
+through build command Image will be created
+
+to login to registry we use docker login
+
+to chnage name we use Tags
+
+to push to resgistry we use docker push gcr.io/
+
+below are commands mainly use in real time
+
+docker build
+docker tag
+docker push
+docker pull
+docker login 
+
+https://docs.docker.com/reference/dockerfile/ - dockerfile
+
+FROM - to get the base image
+
+RUN - to create a new layer and to some task/instructions/process
+
+CMD - to perform the process after container created, it will not create layers
+
+COPY - copies from src location to container (dest location)
+
+ADD - copies, untzr.. unzip, copies files from github, buckets to container destionation.
+
+    COPY and ADD are same but ADD has extra features
+
+REMOTE -
+
+LABEL - metadata - information about the image, represented in key value pairs. you can check once image is created 
+ 
+        docker image inpect <image name>
+
+WORK_DIR: where we define home directory of the container
+
+ENV - when you want to pass extra values when running a container without changing the image
+
+    Dockerfile:
+
+        FROM ubuntu:trusty
+        ENV course: "GKE"
+        ENV name: "Krishna"
+        CMD echo "$name is learning $course"
+
+        after building image and running it, container shows Krishna is learning GKE
+
+        but when you to update name and course by ENV you can give values when running it
+
+        docker build -t <image:tagname> .
+
+        #if docker file name is other
+
+        docker build -t <image:tag> -f <dockerfile> .
+
+        docker run -it --env name="Meghana" course="AWS" <Imagename>
+
+ARG: same like ENV, but it is used when creadting Image,
+     We can pass values when creating image
+
+     FROM ubuntu:trusty
+     ARG SRC_DIR=/tmp/java
+     RUN mkdir -p $SRC_DIR
+     WORKDIR $SRC_DIR
+
+     docker build -t <image:tagname> .
+
+     if you want to change WORKDIR value then through ARG it is possible by passing dynamically
+
+     docker build -t --build-arg SRC_DIR=/tmp/python <image:tagname> .
+     
+        ex: docker build -t arg:v2 --build-arg SRC_DIR=/tmp/python -f argDockerfile .
+
+            docker run -it arg:v2
+
+they are two ways to specify docker commands that is shell and exec, this applies for run, copy, add, cmd, entrypoint 
+
+    COPY index.html /var/www/html  - shell way
+
+    COPY ["index.html", "/var/www/html"] - exec way
+
+    if you want to use both CMD and entrypoint please use exec
+
+    CMD vs ENTRYPOINT take notes and practice writting dockerfile 
+
+
+
+Container can kill or die by n no of reasons, containers cant able to autoscale, self create, 
