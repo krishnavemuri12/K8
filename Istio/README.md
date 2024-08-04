@@ -1,4 +1,5 @@
 Admission Controllers
+---------------------
 Admission controllers in Kubernetes enforce policies on objects during their creation or modification. They intercept requests to the Kubernetes API server before objects are persisted and can modify or deny requests based on predefined rules.
 
 Sidecar Containers
