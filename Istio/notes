@@ -1,0 +1,25 @@
+##Serive Mesh
+
+service mesh helps you with the traffic management of kubernetes cluster, specially east - west traffic management of the kubernetes cluster.
+
+Traffic between the micro serivces with in the kubernetes cluster is referred to as (E - w) traffic - (internal communication between the microservices)
+it doesnt requires any ingress and egress traffic
+
+if a microservice wants to be exposed outside of kubernetes cluster a ingress has to be created for the that micro service
+
+Traffic that comes from outside of the kubernetes cluster is called ingress traffic.
+Traffic that flows out of the kubernetes cluster is called egress traffic.
+ingress and egress traffic is referred as (n - s) traffic.
+
+Why Istio ?
+
+services in cluster can talk to each other using service names or any other mechanism.
+
+but Istio enhances or adds capabilities to your service to service communication such as mTLS, implement deployment strategies (canary, blue - green) easily, Kiali
+
+kiali - it keeps track of the service to service communication, it helps you to understand how your services are behaving, what are the metrics it can help you with the health and behaviour of the services.
+
+above are the main advantages but there were are other factors as well.
+
+How to implement?
+
