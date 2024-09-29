@@ -1,0 +1,19 @@
+Scheduler:
+
+In pod definition yaml file, every pod has field name called "nodeName". By default it is not set.
+Scheduler goes through all the pods and looks for those that do not have this property set.
+with nodeName you can amanually assign pods to nodes.
+
+in pod.yaml file nodeName will be under spec:
+Example:
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  nodeName: node01
+  containers:
+  -  image: nginx
+     name: nginx
+---
