@@ -1,5 +1,23 @@
-Delete the existing pod
+#Delete the existing pod
 Kubectl deleted pod <pod-name> -n <namespace>
 
-create pod from yaml file:
+#create pod from yaml file:
 kubectl create -f nginx.yaml
+
+#check pods in kube-system namespace
+kubectl get pods -n kube-system
+
+#replace command (instead of deleting pod and creating it, you can use replace cmd) only works when pod is not running
+kubectl replace --force -f nginx.yaml
+
+#watch - you can use this command instead of running multiple times
+kubectl get pods --watch
+
+#to select the pods with labels
+kubectl get pods --selector app=App1
+
+##to get pods count ignoring first line inthe output
+kubectl get pods --selector env=dev | tail -n +2 | wc -l or kubectl get pods --selector env=prod --no-headers | wc -l
+
+##tolist all the objects with specifying labels/selectors
+kubectl get all --selector key=value --no-headers | wc -l
