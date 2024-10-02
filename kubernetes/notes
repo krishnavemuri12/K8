@@ -17,3 +17,52 @@ spec:
   -  image: nginx
      name: nginx
 ---
+
+Scheduler runs as a pod in in the kube-system
+
+===============================================================================================================
+
+Labels and Selectors:
+in pod definition yaml file under metadata create a section called labels
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: App1
+    function: nginx-label
+spec:
+  nodeName: node01
+  containers:
+  -  image: nginx
+     name: nginx
+
+to select the pod with labels using kubectl
+kubectl get pods --selector app=App1
+
+not only pods, Labels and selectors can be specified for all objects
+
+In replicaset yaml labels under the metadata are labels of the replicaset itself
+inorder to connect replicaset to the pods we connfigure the selector field under the replica set configuration to match the labels defined on the pod
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+   name: replicaset-1
+spec:
+   replicas: 2
+   selector:   
+      matchLabels:
+        tier: front-end       ###labels in selector and templates should match 
+   template:
+     metadata:
+       labels:
+        tier: nginx           ##labels in selector and templates should match, then only yaml works
+     spec:
+       containers:
+       - name: nginx
+         image: nginx
+
+=============================================================================================================================================
+
