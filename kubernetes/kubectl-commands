@@ -1,5 +1,5 @@
 #Delete the existing pod
-Kubectl deleted pod <pod-name> -n <namespace>
+Kubectl delete pod <pod-name> -n <namespace>
 
 #create pod from yaml file:
 kubectl create -f nginx.yaml
