@@ -2,7 +2,7 @@ Scheduler:
 
 In pod definition yaml file, every pod has field name called "nodeName". By default it is not set.
 Scheduler goes through all the pods and looks for those that do not have this property set.
-with nodeName you can amanually assign pods to nodes.
+with nodeName you can manually assign pods to nodes.
 
 in pod.yaml file nodeName will be under spec:
 Example:
@@ -23,7 +23,7 @@ Scheduler runs as a pod in in the kube-system
 ===============================================================================================================
 
 Labels and Selectors:
-in pod definition yaml file under metadata create a section called labels
+in pod definition yaml file labels should be created under metadata
 
 apiVersion: v1
 kind: Pod
@@ -50,6 +50,9 @@ apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
    name: replicaset-1
+   labels:
+    app: App1
+    function: nginx-label
 spec:
    replicas: 2
    selector:   
