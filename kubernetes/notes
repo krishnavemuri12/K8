@@ -69,3 +69,44 @@ spec:
 
 =============================================================================================================================================
 
+Taints and Tolerations:
+=======================
+
+pod-to-node relationship
+
+Taints are set on nodes, tolerations are set on pods
+
+if taint is set on node, Scheduler places only the tolerant pod to that node which is tolerant to that pod.
+
+
+Taints and tolerations are only meant to restrict nodes from accepting certain pods.
+if your requirement is to restrict a pod to certain nodes, it is achieved through another concept called as node affinity
+
+Scheduler doesnt place ay pods in the master it is due to a ntaint is set on the master node automatically that prevents pods from being scheduled on this node.
+to check
+kubectl describe node kubemaster | grep Taint
+
+kubectl taint nodes node1 key1=value1:NoSchedule
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bee
+spec:
+  containers:
+  - image: nginx
+    name: bee
+  tolerations:
+  - key: spray
+    value: mortein
+    effect: NoSchedule
+    operator: Equal
+
+kubctl taint --help
+
+kubectl get nodes -o json | jq '.items[].spec.taints'
+will produce the list of the taints per each node
+
+#to untaint
+kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
