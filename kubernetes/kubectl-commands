@@ -1,8 +1,14 @@
+#to create a pod
+kubectl run <podname> --image=<image-name>
+
 #Delete the existing pod
 Kubectl delete pod <pod-name> -n <namespace>
 
 #create pod from yaml file:
 kubectl create -f nginx.yaml
+
+#to generate a yaml file without creating a pod
+kubcetl run <podname> --image=nginx --dry-run=client -o yaml > file.yaml
 
 #check pods in kube-system namespace
 kubectl get pods -n kube-system
@@ -21,3 +27,8 @@ kubectl get pods --selector env=dev | tail -n +2 | wc -l or kubectl get pods --s
 
 ##tolist all the objects with specifying labels/selectors
 kubectl get all --selector key=value --no-headers | wc -l
+
+kubcetl describe noe nodename | grep Taint - to check taints
+
+#which will give the complete spec with node name
+kubectl get nodes -o json | jq '.items[].spec'
