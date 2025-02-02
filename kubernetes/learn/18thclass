@@ -1,0 +1,62 @@
+Every application in K8 at the end of it deploys on pods
+
+pods has containers, 
+every containers must have resource capacity
+    1 - cpu
+    2 - memory
+In resources we have requests and limits
+  requests - minimum resources required by the container
+  limits - maximum resources that can be used by the container
+
+when the resources are not available or it is higher than the underlying node resources, the pod will be in pending state.
+
+In Kubernetes (k8s), Quality of Service (QoS) classes are used to make decisions about scheduling and evicting pods. There are three QoS classes:
+
+1. **Guaranteed**: it is Highest priority
+   - Pods are assigned this class if every container in the pod has both memory and CPU limits and requests set, and they are equal.
+   - These pods are the most likely to be scheduled and the least likely to be evicted.
+
+2. **Burstable**: 
+   - Pods are assigned this class if they have at least one container with a memory or CPU request set, but not all containers have equal memory and CPU limits and requests.
+   - These pods have a higher chance of being scheduled and a lower chance of being evicted compared to BestEffort pods.
+
+3. **BestEffort**: not recommded
+   - Pods are assigned this class if none of the containers in the pod have memory or CPU requests or limits set.
+   - These pods are the least likely to be scheduled and the most likely to be evicted under resource pressure.
+
+Here's an example of a pod specification with different QoS classes:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: qos-example
+spec:
+  containers:
+  - name: guaranteed-container
+    image: nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "64Mi"
+        cpu: "250m"
+  - name: burstable-container
+    image: nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+  - name: besteffort-container
+    image: nginx
+```
+
+In this example:
+- `guaranteed-container` will be in the Guaranteed QoS class.
+- `burstable-container` will be in the Burstable QoS class.
+- `besteffort-container` will be in the BestEffort QoS class.
+
+Understanding QoS classes helps in managing resource allocation and ensuring that critical applications have the necessary resources to run efficiently.
+
+bluegreen deployment on svc listen the class (pending)    
