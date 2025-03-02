@@ -21,6 +21,7 @@ spec:
         ports:
         - containerPort: 80
 
+---
 # service for nginx-nodeport
 apiVersion: v1
 kind: Service

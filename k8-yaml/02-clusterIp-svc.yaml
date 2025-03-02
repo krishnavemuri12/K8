@@ -1,0 +1,46 @@
+#deploy nginx with nodeport service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clusterip-nginx-deployment
+  labels:
+    app: nginx-clusterip
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-clusterip
+      type: ClusterIP
+  template:
+    metadata:
+      labels:
+        app: nginx-clusterip
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+        ports:
+        - containerPort: 80
+
+---
+# service for nginx-nodeport
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: nginx-nodeport
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
