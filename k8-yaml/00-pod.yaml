@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  labels:
+    app: busybox-pod
+spec:
+  containers:
+  - name: busybox
+    image: radial/busyboxplus:curl
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    command: ['sh', '-c', 'while true; do echo "Hello, Kubernetes!"; sleep 10; done']
