@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod # this is a pod
+metadata:
+  name: hostpath-pod
+  labels:
+    app: hostpath-pod
+spec:
+  containers:
+  - name: hostpath-container
+    image: busybox # this is a busybox image
+    command: ['sh', '-c', echo "Hello kubernetes from hostpath pod!" > /output/index.txt]
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "200m"
+      requests:
+        memory: "64Mi"
+        cpu: "100m"
+    volumeMounts: # this is the volume mount defined in container spec because applications runs in the container
+    - name: hostpath-vol # this is the volume name
+      mountPath: /output
+  volumes: # this is the volume defined in pod spec because pod is the parent of container and volumes are specified at pod level
+  - name: hostpath-vol # this is the volume name
+    hostPath:
+      path: /var/data # this is the path in workernode where the pod will write the file

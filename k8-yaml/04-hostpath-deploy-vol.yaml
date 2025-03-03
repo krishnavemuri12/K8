@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hostpath-deploy
+  labels:
+    app: hostpath-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hostpath-deploy
+  template:
+    metadata:
+      labels:
+        app: hostpath-deploy
+    spec:
+      containers:
+      - name: hostpath-container
+        image: busybox
+        command: ['sh', '-c', 'echo "Hello kubernetes from hostpath deploy!" > /output/index.txt']
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: hostpath-vol
+          mountPath: /output
+      volumes:
+      - name: hostpath-vol
+        hostPath: 
+          path: /var/temp/deploy  # this is the path in workernode where the pod will write the file

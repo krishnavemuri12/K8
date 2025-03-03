@@ -1,0 +1,18 @@
+1 - create a new deployment called my project with image nginx:1.16 and 1 replica. Next upgrade the deployment to version 1.17 using rolling update
+make sure that the version upgrade is recorded in the resource annotation
+------------------------------------------------------------------------------
+2 - Create a new pod called web-pod with image busybox. Allow the pod to be able to set system_time
+the container should sleep for 3200 seconds
+------------------------------------------------------------------------------
+3 - Deploy a web-nginx pod using the nginx:1.17 image with the labels set to tier=web-app
+------------------------------------------------------------------------------
+4 - Create a static pod on node01 called static-pod with image nginx.
+you have to make sure that it is recreated/restarted automatically in case of any failure happens
+------------------------------------------------------------------------------
+5 - create a pod called pod-multi with two containers as given below
+container 1 - name: container1, image: nginx
+container 2 - name: container2, image: busybox, command: sleep 4800
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
