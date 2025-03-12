@@ -1,0 +1,38 @@
+#configMap with volumes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cm-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cm-deployment
+  template:
+    metadata:
+      labels:
+        app: cm-deployment
+    spec:
+      containers:
+      - name: cm-container
+        image: nginx
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+        volumeMounts:
+        - name: cm-volume
+          mountPath: /etc/config
+        - name: secret-volume
+          mountPath: /etc/secret
+      volumes:
+      - name: cm-volume
+        configMap:
+          name: first-cm-file
+      - name: secret-volume
+        secret:
+          secretName: first-secret

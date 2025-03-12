@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeselector-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nodeselector-pod
+  template:
+    metadata:
+      labels:
+        app: nodeselector-pod
+    spec:
+      containers:
+      - name: nodeselector-container
+        image: busybox
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+      nodeSelector: #The `nodeSelector` field in a Kubernetes Pod specification is used to specify the node label that the pod should be scheduled on. By setting the `nodeSelector`, you are instructing Kubernetes to place the pod on a node that has the specified label.
+        scheduler: nodeselector
+
+# nodeSelector in Kubernetes
+# 
+# - Definition: nodeSelector is a field in Kubernetes pod specifications used to constrain which nodes a pod can be scheduled on based on node labels.
+# - Purpose: Ensures that pods run on specific nodes with matching labels, offering control over pod placement.
+# - Usage: Defined within the pod spec under spec.nodeSelector.
+# - Syntax: 
+#     spec:
+#       nodeSelector:
+#         key: value
+#   Where key is the label key and value is the label value.
+# - Matching Labels: The pod will be scheduled only on nodes that have the label with the specified key-value pair.
+# - Limitations: 
+#     - Only supports exact matching.
+#     - Can only specify key-value pairs, not more complex conditions.
+#     - Cannot be combined with other scheduling features like Affinity/Anti-Affinity.
+# - Example: Scheduling a pod on nodes with label role=frontend:
+#     spec:
+#       nodeSelector:
+#         role: frontend
+# - Use Case: Often used for controlling workloads in specific node pools (e.g., separating workloads for CPU-intensive or memory-intensive applications).
+
+# kubectl command to add labels to a node:
+# kubectl label nodes <node-name> <label-key>=<label-value>
+
+
+#to show labels of a node
+# kubectl get nodes --show-labels
+
+#to remove labels from a node
+# kubectl label nodes <node-name> <label-key>-
+#example
+# kubectl label nodes gke-my-first-cluster-node-01 scheduler- --where scheduler is key

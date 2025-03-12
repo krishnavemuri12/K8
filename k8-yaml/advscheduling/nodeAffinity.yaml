@@ -1,0 +1,155 @@
+
+###Node Affinity###
+#Node Affinity is a feature in Kubernetes that allows you to control which nodes a pod can be scheduled on based on node labels. 
+#It’s an advanced version of nodeSelector, providing more flexibility.
+
+#There are two types of node affinity:
+
+#requiredDuringSchedulingIgnoredDuringExecution: 
+#    - The pod must be placed on a node that matches the affinity rules.
+#    - If no nodes match, the pod will not be scheduled. It will be in pending state
+#    - example - Krishna wants to go Hyderabad only - it is mandate 
+
+#preferredDuringSchedulingIgnoredDuringExecution: 
+#    - The scheduler tries to place the pod on a preferred node.
+#    - If no preferred nodes are available, the pod is still scheduled elsewhere.
+#    - example - Krishna wants to go Hyderabad or Secunderabad - It has choice
+
+#You can specify node affinities using the .spec.affinity.nodeAffinity field in your Pod spec
+
+# nodeName, nodeSelector, nodeAffinity think from pod perspective
+
+###Taints and Tolerations###
+# taints and tolerations are used to control which pods can be scheduled on which nodes.
+# Taints are applied to nodes, and tolerations are applied to pods.
+
+#if taint is enabled on node, pod should have toleration to run on that node else it will be in pending state
+
+# add taint to node
+# kubectl taint nodes <node-name> key=value:NoSchedule
+# kubectl taint nodes <node-name> key=value:NoExecute
+# kubectl taint nodes <node-name> key=value:PreferNoSchedule
+
+# remove taint from node
+# kubectl taint nodes <node-name> key:NoSchedule-
+
+#Taints have three effects:
+# NoSchedue - pods will not be scheduled unless they have toleration
+# PreferNoSchedule - pods will be scheduled on other nodes if possible
+# NoExecute - pods will be evicted if they do not have toleration
+
+#add toleration to pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: toleration-example
+spec:
+  tolerations:
+  - key: "environment"
+    operator: "Equal"
+    value: "production"
+    effect: "NoSchedule"
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+#This pod can run on a node with the taint environment=production:NoSchedule
+
+#Taints and tolerations are used together to ensure that pods are not scheduled on inappropriate nodes.
+
+
+##**pods have tolerations defined, it can also deploy on nodes with no taints**##
+
+# Taints & Tolerations Combined with nodeSelector
+# Using taints & tolerations along with nodeSelector allows fine-grained control
+# over where pods should be scheduled while ensuring that only specific pods can tolerate tainted nodes.
+
+# 1. Use Case
+# Let’s assume we have 3 nodes:
+# - Node1 & Node2: Dedicated for production workloads, labeled as env=prod,
+#   and tainted to allow only specific pods.
+# - Node3: For general workloads, no taints.
+
+# We want to:
+# ✅ Taint nodes to prevent non-production pods from running on env=prod nodes.
+# ✅ Use nodeSelector to ensure only production pods run on env=prod nodes.
+# ✅ Use tolerations so only pods that tolerate the taint can be scheduled.
+
+# 2. Apply Taints to Nodes
+# Run these commands to taint Node1 and Node2:
+# kubectl taint nodes node1 env=prod:NoSchedule
+# kubectl taint nodes node2 env=prod:NoSchedule
+# Effect: Pods without tolerations cannot be scheduled on these nodes.
+
+# 3. Deployment with Tolerations + nodeSelector
+# This Deployment:
+# ✅ Uses nodeSelector to prefer nodes labeled env=prod.
+# ✅ Uses a toleration to allow the pod to run on tainted nodes.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: production-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: prod-app
+  template:
+    metadata:
+      labels:
+        app: prod-app
+    spec:
+      nodeSelector:
+        env: prod  # Ensure pods run only on nodes labeled env=prod
+      tolerations:
+      - key: "env"
+        operator: "Equal"
+        value: "prod"
+        effect: "NoSchedule"  # Tolerate nodes with the env=prod:NoSchedule taint
+      containers:
+      - name: app-container
+        image: nginx
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+# This Deployment ensures that pods are scheduled on nodes labeled env=prod.
+
+# 4. Explanation of Key Fields
+# Field                                      Purpose
+# -------------------------------------------------------------
+# kubectl taint nodes node1 env=prod:NoSchedule   Prevents scheduling on node1 unless a pod has a matching toleration.
+# nodeSelector: env: prod                         Ensures pods only target nodes labeled as env=prod.
+# tolerations:                                    Allows the pod to tolerate tainted env=prod nodes.
+# effect: NoSchedule                              The pod must have a toleration to be scheduled.
+
+# 5. Verify Deployment
+# Check Node Labels:
+# kubectl get nodes --show-labels
+# Ensure node1 and node2 have the label env=prod.
+
+# Check Node Taints:
+# kubectl describe node node1 | grep Taint
+# kubectl describe node node2 | grep Taint
+# Output should show:
+# Taints: env=prod:NoSchedule
+
+# Check Pod Scheduling:
+# kubectl get pods -o wide
+# Pods should be running on node1 or node2.
+# If no matching nodes are available, pods remain Pending.
+
+# 6. Remove Taint (If Needed)
+# kubectl taint nodes node1 env=prod:NoSchedule-
+# kubectl taint nodes node2 env=prod:NoSchedule-
+# The "-" at the end removes the taint.

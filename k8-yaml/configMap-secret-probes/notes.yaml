@@ -1,0 +1,158 @@
+#Application Configurations - When you want to pass dynamic values to your application during runtime to contr ol how they behave
+
+#In Docker: 
+#   args - send dynamic values to the container when image is build
+#   env - send dynamic values to the container when container is creating from the image
+
+#In Kubernetes:
+# ConfigMap - store key-value pairs in a central location and use them in your application
+#   A ConfigMap is an object used to store non-confidential configuration data in key-value pairs.
+#   pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
+#   It's used to keep your application’s configuration separate from its container image,making your apps more portable and easier to manage.
+
+apiVersion: v1
+data:
+  name: krishna # this is refered to pod see below for refering configMap in pod
+  learn: k8s
+  key3: |
+    value1
+    value2
+    value3 
+kind: ConfigMap
+metadata:
+  name: first-cm
+  namespace: default
+# you can pass multiple values in a single key using | and then new line
+# there is no spec section in ConfigMap instead there is data section where you can define key-value pairs
+
+# Secret - store sensitive information in a central location and use them in your application
+#     Used to store sensitive data such as passwords, tokens, keys.
+#     Keeps secrets separate from application code and configs.
+#     Base64 encoded (⚠️ not encrypted by default). 
+#     Ensure secrets are managed securely in your environment.
+
+# Types of Secrets:
+# https://kubernetes.io/docs/concepts/configuration/secret/#secret-types
+# 1. Opaque: Default type. Used to store arbitrary data.
+# 2. kubernetes.io/service-account-token: Used to mount service account tokens.
+# 3. kubernetes.io/dockercfg: Used to store Docker credentials.
+# 4. tls: Used to store TLS certificates. 
+
+# ----------------- #
+# kubectl commands:
+
+# kubectl get cm
+
+# from literal
+# kubectl create configmap my-config --from-literal=KEY1=VALUE1 --from-literal=KEY2=VALUE2
+
+# from file in real time we usd to pass data from file
+# kubectl create configmap my-config --from-file=path/to/file
+# example you want to pass data from app-config.properties file
+# kubectl create configmap first-cm-file --from-file=app-config.properties
+---
+apiVersion: v1
+data:
+  app-config.properties: | #file content
+    # Application settings
+    app.name=PaymentService
+    app.version=1.5.0
+    app.environment=staging
+
+    # Database config
+    db.host=db.prod.internal
+    db.port=5432
+    db.user=admin
+
+    # Feature flags
+    feature.login.enabled=true
+    feature.payment.retry=true
+kind: ConfigMap
+metadata:
+  name: first-cm-file
+  namespace: default
+
+# kubectl secrets
+
+# kubectl get secrets
+# kubectl create secret generic my-secret --from-literal=username=admin --from-literal=password=pass123
+
+# kubectl create secret generic my-secret --from-file=path/to/file
+
+# to decode secret
+# echo -n 'cGFzc3dvcmQ=' | base64 --decode
+
+---
+# this is refered to pod see below for refering configMap and secret in pod
+apiVersion: v1
+data:
+  password: cGFzczEyMw== # base64 encoded value
+  username: YWRtaW4= # base64 encoded value
+kind: Secret
+metadata:
+  name: first-secret
+  namespace: default
+type: Opaque # type of secret - Opaque is default type
+
+# from yaml file when creating secret encode the value using base
+# echo -n 'password123' | base64
+# from kubectl command line from literal you can directly pass the value and it will encode it for you
+
+---
+# refering configMap and secrets in pod for key-value pair
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-pod
+spec:
+  containers:
+  - name: cm-container
+    image: busybox
+    command: ['sh', '-c', 'echo Configmap is $CONFIGNAME && echo Secret is $SECRETNAME && sleep 3600']
+    env:
+    - name: CONFIGNAME # env variable name that used in command
+      valueFrom:
+        configMapKeyRef: #referring configMap
+          name: first-cm # configMap name
+          key: name
+    - name: SECRETNAME # env variable name that used in command
+      valueFrom:
+        secretKeyRef: # referring secret
+          name: first-secret # secret name
+          key: username
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+# environment is set to the key 'name' in the ConfigMap 'first-cm'
+# To check the environment variable in the pod, run the following command:
+# kubectl exec -it cm-pod -- env | grep CONFIGNAME/SECRETNAME or kubectl logs cm-pod
+---
+# refering configMap in pod for all key-value pairs
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-pod-all
+spec:
+  containers:
+  - name: cm-container-all
+    image: alpine # lightweight image
+    command: ["sleep", "3600"] #
+    envFrom:
+      - configMapRef: #referring configMap for all key-value pairs
+          name: first-cm # configMap name
+      - secretRef:
+          name: first-secret # secret name
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+
+# kubectl exec -it cm-pod-all -- /bin/sh -c printenv - to check all env variables
+# you can send multiple configMaps in envFrom section as well and specify the key name from env variable

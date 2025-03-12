@@ -1,0 +1,36 @@
+apiVersion: v1|
+kind: Deployment
+metadata:
+  name: required-deployment
+  labels:
+    app: required-deployment
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: scheduler
+            operator: In
+            values:
+            - required
+  replicas: 2
+  selector:
+    matchLabels:
+      app: required-deployment
+  template:
+    metadata:
+      labels:
+        app: required-deployment
+    spec:
+      containers:
+      - name: required-container
+        image: busybox
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          

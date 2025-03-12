@@ -1,0 +1,12 @@
+#create pvc
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-storageclass
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: gcp-disk-standard-disk

@@ -1,0 +1,35 @@
+#deploy busybox with pvc
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvc-busybox-deployment
+  labels:
+    app: busybox-clusterip
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox-clusterip
+  template:
+    metadata:
+      labels:
+        app: busybox-clusterip
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ['sh', '-c', 'while true; do echo "Hello kubernetes from pvc deploy!" > /krishna/meghana.txt; sleep 3600; done']
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: my-storage # this name should match the name in volumes
+          mountPath: "/krishna"
+      volumes:
+      - name: my-storage # this name should match the name in volumeMounts
+        persistentVolumeClaim:
+          claimName: pvc-storageclass

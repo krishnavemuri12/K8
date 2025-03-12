@@ -1,0 +1,45 @@
+# 3 nodes
+# Node1: make node label as cpu:intel and dc=mum
+# Node2: make node label as cpu:intel and dc=mum
+# Node3: make node label as cpu:amd and dc=pune
+
+#deploy pod in intel cpu node and dc=mum only - deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-affinity
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      apps: affinity
+  template:
+    metadata:
+      labels:
+        apps: affinity
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cpu
+                operator: In
+                values:
+                - intel
+              - key: dc
+                operator: In
+                values:
+                - mum
+      containers:
+      - name: pod-affinity
+        image: busybox
+        command: ["/bin/sh", "-c", "sleep 3600"]  # Keep the container running
+        resources:
+          requests:
+            cpu: 10m
+            memory: 20Mi
+          limits:
+            cpu: 20m
+            memory: 40Mi

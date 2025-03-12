@@ -13,6 +13,10 @@ you have to make sure that it is recreated/restarted automatically in case of an
 container 1 - name: container1, image: nginx
 container 2 - name: container2, image: busybox, command: sleep 4800
 ------------------------------------------------------------------------------
+Use JSON PATH query to retrieve the osImages of all the nodes and store it in a file /opt/outputs/nodes_os_x43kj56.txt.
+
+
+The osImage are under the nodeInfo section under status of each node.
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------

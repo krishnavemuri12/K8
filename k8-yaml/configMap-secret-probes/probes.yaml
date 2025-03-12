@@ -1,0 +1,5 @@
+# Livenessprobe:  Allows you to automatically determine if the application inside the container is healthy or not. 
+
+# Readinessprobe: Allows you to determine if the application inside the container is ready to accept traffic or not.
+
+# Both liveness & readiness probes are used to control the health of an application. Failing liveness probe will restart the container, whereas failing readiness probe will stop our application from serving traffic.

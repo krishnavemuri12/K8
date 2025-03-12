@@ -1,0 +1,9 @@
+#  when executing kubectl commands apiserver will perform authentication and authorization
+#  authentication: verifying the identity of the user/service account
+#  authorization: determining the permissions of the user/service account
+#  kubectl uses kubeconfig file to authenticate with the API server
+#  kubeconfig file is located at ~/.kube/config
+
+# In kubernetes, there is no option to create a user directly. it will rely on third party identity providers like LDAP, AD, OIDC, etc.
+# In kubernetes, the user is represented by a service account. A service account is a resource in the kubernetes API that represents an identity that a pod can use to interact with the API server.
+

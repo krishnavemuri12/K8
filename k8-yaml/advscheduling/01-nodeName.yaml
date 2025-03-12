@@ -1,0 +1,21 @@
+#The `nodeName` field in a Kubernetes Pod specification is used to specify the name of the node where the pod should be scheduled. By setting the `nodeName`, you are instructing Kubernetes to place the pod on a specific node in the cluster.
+
+### Example:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nodename-pod
+spec:
+  nodeName: gke-my-first-cluster-node-01 # this is the name of the node where the pod will be scheduled
+  containers:
+  - name: nodename-container
+    image: busybox
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+
+#In this example, the pod named `nodename-pod` will be scheduled to run on the node with the name `gke-my-first-cluster-node-01`.
