@@ -1,0 +1,14 @@
+# Network policy - restrict the communication between pods.
+# they are bounded to namespace.
+
+# Allow and Deny traffic to the pods in the namespace
+# Ingress - incoming traffic to the pod - Eg: from other pods, from external, etc
+# Egress - outgoing traffic from pod - Eg: to other pods, to external, etc 
+
+#           Ingress                Egress - Ingress on api-server and Egress on Api-server to allow connection to DB
+# customer ==========>> Nginx-pod ===========>> api-server ========>> DB
+
+# When setting network policies there are three traffic to consider:
+# pod-selector - select the pods to apply the policy (to and from pod)
+# namespace-selector - select the namespace to apply the policy (to and from namespace)
+# ip-block - select the ip block to apply the policy (to restrict specific IP ranges)

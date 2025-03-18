@@ -1,0 +1,81 @@
+# -----------------------------------------------
+# 🔐 Kubernetes RBAC Concepts: Roles vs RoleBindings vs Users vs ServiceAccounts
+# -----------------------------------------------
+
+# 📌 Role
+# - A Role defines a set of permissions (verbs) on resources within a **namespace**.
+# - It controls **what actions can be performed** and on **which resources**.
+# - Example: Allow get/list pods in a specific namespace.
+
+# 📌 ClusterRole (global version of Role)
+# - Like a Role, but can be applied **cluster-wide** or across multiple namespaces.
+# - Used for granting access to non-namespaced resources (e.g., nodes).
+
+# 📌 RoleBinding
+# - Connects a **Role** to a **User**, **Group**, or **ServiceAccount** within a namespace.
+# - Grants the permissions defined in the Role to the subject.
+
+# 📌 ClusterRoleBinding
+# - Connects a **ClusterRole** to a User/Group/ServiceAccount at the **cluster level**.
+
+# 📌 User
+# - Represents a human (e.g., you, via `kubectl`) authenticated externally (OIDC, certificates).
+# - Kubernetes does NOT manage users directly.
+# - Example: Your GCP IAM or Active Directory account.
+
+# 📌 ServiceAccount
+# - Represents an **application or pod** inside the cluster.
+# - Automatically mounted into pods by Kubernetes.
+# - Used by workloads to authenticate to the API server.
+
+# ✅ Summary Table
+
+# | Component         | Purpose                               | Scope         |
+# |-------------------|----------------------------------------|---------------|
+# | Role              | Defines permissions                    | Namespace     |
+# | ClusterRole       | Defines permissions                    | Cluster-wide  |
+# | RoleBinding       | Binds Role to user/group/SA            | Namespace     |
+# | ClusterRoleBinding| Binds ClusterRole to user/group/SA     | Cluster-wide  |
+# | User              | Human identity (external auth)         | Cluster       |
+# | ServiceAccount    | Pod identity (managed by Kubernetes)   | Namespace     |
+
+# -----------------------------------------------
+# Sample Role, RoleBinding, and ServiceAccount
+# -----------------------------------------------
+
+# This Role allows get/list on pods in a namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+---
+
+# This ServiceAccount represents an in-cluster app
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-app
+  namespace: default
+
+---
+
+# This RoleBinding gives the Role to the ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: my-app
+  namespace: default
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io

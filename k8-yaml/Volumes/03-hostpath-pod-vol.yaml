@@ -23,3 +23,8 @@ spec:
   - name: hostpath-vol # this is the volume name
     hostPath:
       path: /var/data # this is the path in workernode where the pod will write the file
+
+# volumes at pod level are used to share data between containers in the pod
+# volumeMounts at container level are used to mount the volume to the container
+# hostPath volume type is used to mount the directory from the host node's filesystem to the pod
+# hostPath volume type is restricted to the node where the pod is running.

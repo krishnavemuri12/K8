@@ -1,0 +1,6 @@
+{
+    "github.copilot.editor.enableAutoCompletions": true,
+    "github.copilot.editor.enableCodeActions": true,
+    "github.copilot.chat.fixTestFailure.enabled": true,
+    "github.copilot.chat.edits.codesearch.enabled": true
+}

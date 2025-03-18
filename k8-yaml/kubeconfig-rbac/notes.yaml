@@ -1,9 +1,114 @@
+
+
+
 #  when executing kubectl commands apiserver will perform authentication and authorization
-#  authentication: verifying the identity of the user/service account
-#  authorization: determining the permissions of the user/service account
+#  authentication: verifying the identity of the user/service account - who can access the cluster?
+#      - authentication is done using certificates, tokens, and other methods.
+#  authorization: determining the permissions of the user/service account - what can the user/service account do? it comes after authentication.
+#      - RBAC (Role Based Access Control) is used to define the permissions of the user/service account.
+#      - RBAC is used to control access to the kubernetes API server.
+
+#  All communication between the services (kube Apiserver, etcd, kubeproxy..etc) in the cluster is secured using TLS certificates.
+
+#  By default, all the pods in the cluster can communicate with the other pods in the cluster. we can restrict the access using network policies.
+
 #  kubectl uses kubeconfig file to authenticate with the API server
 #  kubeconfig file is located at ~/.kube/config
 
 # In kubernetes, there is no option to create a user directly. it will rely on third party identity providers like LDAP, AD, OIDC, etc.
 # In kubernetes, the user is represented by a service account. A service account is a resource in the kubernetes API that represents an identity that a pod can use to interact with the API server.
 
+# create a jump server to connect to gke cluster
+# configue kubeconfig file to connect to gke cluster
+
+# *** kube config file will be available in ~/.kube/config ***
+# kubeconfig file is used to authenticate with the API server
+
+# In managed kubernetes services like GKE, EKS, AKS, the kubeconfig file is automatically generated when connect to the cluster using gcloud, aws, or azure cli.
+
+apiVersion: v1
+kind: Config
+clusters:
+- name: gke-my-first-cluster
+  cluster:
+    server: https://10.xx.xx.xx:6443 #apiserver endpoint
+    certificate-authority-data: #
+contexts:
+- name: gke-my-first-cluster #context is a combination of a cluster and a user.
+  context:
+    cluster: gke-my-first-cluster
+    user: gke-my-first-user
+current-context: gke-my-first-cluster
+users:
+- name: gke-my-first-user
+  users:
+    client-certificate-data: 
+    client-key-data:
+# In this example, the kubeconfig file has a cluster, context, and user section.
+# The cluster section contains the details of the kubernetes cluster.
+
+# context is a combination of a cluster and a user. It defines the cluster and user to use when executing kubectl commands.
+
+# multiple clusters and users can be defined in the kubeconfig file. Each cluster has a unique name and details like the server URL.
+
+# there are multiple ways to authenticate with the kubernetes API server:
+# we can set credentials by kubectl command
+# kubectl config set-credentials <user-name> --client-certificate=<path-to-certificate> --client-key=<path-to-key>
+
+# kubectl config - command we can get the current context, set the current context, view the list of contexts, and switch between contexts.
+
+#-------------------------------------------------------------#
+# Role Based Access Control (RBAC) in Kubernetes #
+#-------------------------------------------------------------#
+
+# In kubernetes, we are having two objects for permissions:
+#    - Roles: A role is a set of permissions that define what actions a user or service account can perform within a "namespace".
+#    - ClusterRoles: A cluster role is a set of permissions that define what actions a user or service account can perform across the "entire cluster".
+
+# RoleBinding: A role binding is used to bind a role to a user or service account within a namespace. (role+user/service account)
+# ClusterRoleBinding: A cluster role binding is used to bind a cluster role to a user or service account across the entire cluster. (cluster role+user/service account)
+
+# kubectl api-resources 
+# The kubectl api-resources command lists all the Kubernetes resource types available on the current cluster, along with details like whether they're namespaced or not
+
+# Role:
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: assign-roles
+  namespace: default
+rules:
+  - apiGroups: [""] # "" indicates the core API group (v1)
+    resources: ["pods"] # resources are the objects that can be accessed.
+    verbs: ["get", "watch", "list"] # verbs are the actions that can be performed on the resources.
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+
+# kubectl get roles
+
+# -----------------
+# There are two types of accounts:
+#    - User Account: used by humans to interact with the kubernetes cluster. (admin, developer, etc.)
+#    - Service Account: used by applications to interact with the kubernetes cluster. (pods, deployments, etc.)
+#       example: Prometheus uses service account to pull the kubernetes metrics.
+#                Jenkins uses service account to deploy the application to kubernetes.
+#    - Service accounts are automatically created in each namespace and can be used to restrict the access of a pod.
+#  Each namespace has a default service account that is automatically created when the namespace is created.
+#  Whenever a pod is created in a namespace, a volume is automatically mounted in the pod that contains the service account token.
+
+# kubectl create serviceaccount <service-account-name> -n <namespace>
+# kubectl get serviceaccount <service-account-name> -n <namespace>
+# kubectl describe serviceaccount <service-account-name> -n <namespace>
+
+# When service account is created, it will create a token automatically and store as a secret object.
+# token can be used to authenticate when interacting with the kubernetes API server.
+
+# example - using curl to interact with the kubernetes API server using the service account token.
+# curl https://<apiserver-endpoint>/api/v1/pods -insecure --header "Authorization: Bearer <service-account-token>"
+
+# you can create a service account, assigns the right permissions using roles and rolebindings and expose the service account token to use to the third party applications to interact with the kubernetes API server.
+
+# If application is hosted on the kubernetes cluster
+#    - token can be mounted as a volume in the pod.

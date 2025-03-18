@@ -1,9 +1,36 @@
-#Application Configurations - When you want to pass dynamic values to your application during runtime to contr ol how they behave
+#Application Configurations - When you want to pass dynamic values to your application during runtime to control how they behave
 
 #In Docker: 
 #   args - send dynamic values to the container when image is build
 #   env - send dynamic values to the container when container is creating from the image
 
+# In pod we can directly define values in the pod yaml file using env section as shown below in the example
+# But when you have multiple pods and you want to pass same values to all the pods then you can use ConfigMap and Secret
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod-env
+spec:
+  containers:
+  - name: my-container
+    image: busybox
+    command: ['sh', '-c', 'echo Hello, Kubernetes! && sleep 3600']
+    env:
+    - name: MY_NAME # env variable name that used in command
+      value: Krishna # value that you want to pass
+    - name: MY_ROLE # env variable name that used in command
+      value: Developer # value that you want to pass
+    - name: MY_APP # env variable name that used in command
+      value: k8s # value that you want to pass
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+---
 #In Kubernetes:
 # ConfigMap - store key-value pairs in a central location and use them in your application
 #   A ConfigMap is an object used to store non-confidential configuration data in key-value pairs.
@@ -49,7 +76,7 @@ metadata:
 # from file in real time we usd to pass data from file
 # kubectl create configmap my-config --from-file=path/to/file
 # example you want to pass data from app-config.properties file
-# kubectl create configmap first-cm-file --from-file=app-config.properties
+# kubectl create configmap first-cm-file --from-file=/data/app-config.properties
 ---
 apiVersion: v1
 data:
@@ -156,3 +183,5 @@ spec:
 
 # kubectl exec -it cm-pod-all -- /bin/sh -c printenv - to check all env variables
 # you can send multiple configMaps in envFrom section as well and specify the key name from env variable
+
+# refer inject ways to configMap in pod - see image in /data/cm-inject.png

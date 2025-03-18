@@ -56,3 +56,4 @@ Bob = Security guard
 Bob accepts Alice's ID because it was signed by someone he trusts (the school official).
 
 https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ssl.com%2Ffaqs%2Fwhat-is-a-certificate-authority%2F&psig=AOvVaw2iMUxv5A5OifDd2dmd0zs7&ust=1741863316353000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMjj3tOwhIwDFQAAAAAdAAAAABAE
+  
