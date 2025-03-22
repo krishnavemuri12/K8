@@ -1,0 +1,121 @@
+# Livenessprobe:  Allows you to automatically determine if the application inside the container is healthy or not. 
+
+# Readinessprobe: Allows you to determine if the application inside the container is ready to accept traffic or not.
+
+# Both liveness & readiness probes are used to control the health of an application. Failing liveness probe will restart the container, whereas failing readiness probe will stop our application from serving traffic.
+
+==============================
+Kubernetes Probes: Liveness vs Readiness
+==============================
+
+Kubernetes uses liveness and readiness probes to monitor and manage the health of containers running in pods.
+
+----------------------------------------
+What Are Probes?
+----------------------------------------
+
+✅ Liveness Probe:
+- Checks if the application is running (alive).
+- If the liveness probe fails, Kubernetes restarts the container.
+
+✅ Readiness Probe:
+- Checks if the application is ready to serve requests.
+- If the readiness probe fails, Kubernetes removes the pod from the Service endpoints (i.e., it won't receive traffic).
+
+----------------------------------------
+Why Are Probes Used?
+----------------------------------------
+
+| Probe     | Purpose                                      |
+|-----------|----------------------------------------------|
+| Liveness  | Detect crashed apps and trigger restarts     |
+| Readiness | Ensure traffic is only sent to ready pods    |
+
+----------------------------------------
+Fields Used by Probes
+----------------------------------------
+
+- initialDelaySeconds: Delay before the first probe runs
+- periodSeconds: How often to perform the probe
+- timeoutSeconds: Probe timeout duration
+- successThreshold: Consecutive successes for probe to pass
+- failureThreshold: Consecutive failures before action is taken
+
+----------------------------------------
+YAML Examples for Each Probe Type specified at pod level
+----------------------------------------
+
+1️⃣ HTTP Probe (Liveness and Readiness)
+
+Liveness:
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+Readiness:
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+----------------------------------------
+
+2️⃣ TCP Probe
+
+livenessProbe:
+  tcpSocket:
+    port: 3306
+  initialDelaySeconds: 10
+  periodSeconds: 15
+
+----------------------------------------
+
+3️⃣ Exec Probe
+
+livenessProbe:
+  exec:
+    command:
+      - cat
+      - /tmp/healthy
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+----------------------------------------
+kubectl Commands for Probes
+----------------------------------------
+
+🔎 View Pod Probe Details:
+kubectl describe pod <pod-name>
+
+📦 Apply a Pod Spec with Probes:
+kubectl apply -f pod-with-probes.yaml
+
+🚨 Simulate Liveness Probe Failure:
+kubectl exec -it <pod-name> -- rm /tmp/healthy
+
+----------------------------------------
+Difference Between Liveness and Readiness
+----------------------------------------
+
+| Feature         | Liveness Probe             | Readiness Probe                  |
+|-----------------|----------------------------|----------------------------------|
+| Purpose         | Detect crash and restart   | Control traffic routing          |
+| On Failure      | Restart container          | Remove pod from Service endpoints |
+| Traffic Impact  | No effect                  | Pod won't receive traffic        |
+| Typical Use     | Crash recovery             | Startup delay, load balancing    |
+
+----------------------------------------
+Summary
+----------------------------------------
+
+- Liveness probes are used to auto-restart stuck containers.
+- Readiness probes prevent traffic until the app is fully ready.
+- Use httpGet, tcpSocket, or exec depending on your app's behavior.
+

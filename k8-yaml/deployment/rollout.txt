@@ -1,0 +1,86 @@
+Kubernetes Deployment: Updates & Rollbacks
+==========================================
+
+🚀 Rollouts and Versioning
+--------------------------
+- Creating a Deployment triggers a rollout.
+- Each rollout creates a new revision (Revision 1, Revision 2, etc.).
+- A new revision is created when:
+  - Container image is updated
+  - Labels are changed
+  - Number of replicas is modified
+
+🔍 Checking Rollout Status & History
+-----------------------------------
+- Check rollout status:
+  kubectl rollout status deployment/<deployment-name>
+
+- View rollout history:
+  kubectl rollout history deployment/<deployment-name>
+
+🧩 Deployment Strategies
+------------------------
+1. Recreate Strategy
+   - Deletes all old Pods first, then creates new ones
+   - Causes downtime
+   - Not the default strategy
+
+2. Rolling Update Strategy (default)
+   - Updates Pods one at a time
+   - Keeps app available during update
+   - Scales down old Pods while scaling up new Pods
+
+🔄 Updating a Deployment
+------------------------
+- Option 1: Edit the YAML file and apply changes
+  kubectl apply -f <deployment-file.yaml>
+
+- Option 2: Update image directly
+  kubectl set image deployment/<deployment-name> <container>=<new-image>
+  ⚠️ This won’t update your YAML file automatically
+
+📋 Viewing Deployment Details
+-----------------------------
+- View full deployment info:
+  kubectl describe deployment <deployment-name>
+
+⚙️ How Upgrades Work Internally
+-------------------------------
+- Deployment creates a ReplicaSet (RS) to manage Pods
+- On update:
+  - A new RS is created
+  - New Pods are added from the new RS
+  - Old Pods are deleted from the old RS
+- View RS:
+  kubectl get rs
+
+↩️ Rolling Back a Deployment
+----------------------------
+- Roll back to a previous version:
+  kubectl rollout undo deployment/<deployment-name>
+
+- After rollback:
+  - Old RS becomes active
+  - New RS is scaled down
+
+🧠 Command Summary
+------------------
+Create Deployment:
+  kubectl create -f <file.yaml>
+
+List Deployments:
+  kubectl get deployments
+
+Update Deployment:
+  kubectl apply -f <file.yaml>
+  OR
+  kubectl set image deployment/<name> <container>=<image>
+
+Rollout Status:
+  kubectl rollout status deployment/<name>
+
+Rollout History:
+  kubectl rollout history deployment/<name>
+
+Rollback Deployment:
+  kubectl rollout undo deployment/<name>

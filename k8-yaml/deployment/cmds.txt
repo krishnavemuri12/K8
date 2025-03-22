@@ -1,0 +1,41 @@
+kubectl rollout Commands Cheat Sheet
+==================================
+
+1. ✅ Check the rollout status
+--------------------------------
+Check if the deployment is complete or still updating:
+kubectl rollout status deployment/<deployment-name>
+
+2. 📜 View rollout history
+----------------------------
+See previous revisions and details about changes:
+kubectl rollout history deployment/<deployment-name>
+
+3. 🔁 Roll back to the previous revision
+-----------------------------------------
+Undo the last deployment and go back to the previous version:
+kubectl rollout undo deployment/<deployment-name>
+
+4. 🔙 Roll back to a specific revision
+---------------------------------------
+(Optional) Roll back to a specific revision number:
+kubectl rollout undo deployment/<deployment-name> --to-revision=<revision-number>
+
+Note: You can find revision numbers from the rollout history command.
+
+5. 🛑 Pause a rollout
+-----------------------
+Pause the deployment process:
+kubectl rollout pause deployment/<deployment-name>
+
+6. ▶️ Resume a paused rollout
+-------------------------------
+Resume the deployment after it's paused:
+kubectl rollout resume deployment/<deployment-name>
+
+
+--record=true (deprecated)
+kubectl set image deployment/my-app my-container=my-image:v2 --record=true
+
+annotate
+kubectl annotate deployment my-app kubernetes.io/change-cause="Updated to v2"

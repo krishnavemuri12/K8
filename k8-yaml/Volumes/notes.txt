@@ -319,53 +319,8 @@ Use Case    - Saving generated data like logs, outputs, etc. even after Pod dele
 - Kubernetes automatically creates and binds a PV.
 - No need for the admin to pre-create PVs.
 
-------------------------------------------------------------
-📄 YAML Examples with Explanation
-------------------------------------------------------------
 
-1️⃣ PersistentVolume (PV) – Static
------------------------------------
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: my-pv
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /mnt/data
-
-➡️ Explanation:
-- `capacity`: 1Gi of storage.
-- `accessModes`: Read/write from one node.
-- `hostPath`: Uses local node path (good for testing).
-- `retainPolicy`: Keeps data after PVC is deleted.
-
----
-
-2️⃣ PersistentVolumeClaim (PVC)
---------------------------------
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: my-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-
-➡️ Explanation:
-- Requests 1Gi storage with RWO access.
-- Kubernetes will bind it to a matching PV.
-
----
-
-3️⃣ Pod using PVC
+Pod using PVC
 -------------------
 apiVersion: v1
 kind: Pod
@@ -386,9 +341,8 @@ spec:
 ➡️ Explanation:
 - Mounts the PVC my-pvc at `/usr/share/nginx/html` inside the Pod.
 
----
 
-4️⃣ StorageClass (for Dynamic Provisioning)
+StorageClass (for Dynamic Provisioning)
 --------------------------------------------
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -433,21 +387,3 @@ spec:
 | PVC             | Claim/request for storage                    | Namespaced    |
 | StorageClass    | How dynamic provisioning should happen       | Cluster-wide  |
 | Pod             | Mounts PVC as a volume                       | Namespaced    |
-
-------------------------------------------------------------
-✅ Common Commands
-------------------------------------------------------------
-
-# List PersistentVolumes
-kubectl get pv
-
-# List PersistentVolumeClaims
-kubectl get pvc
-
-# List StorageClasses
-kubectl get sc
-
-# View detailed info
-kubectl describe pv <name>
-kubectl describe pvc <name>
-kubectl describe sc <name>

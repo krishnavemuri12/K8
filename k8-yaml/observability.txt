@@ -1,0 +1,128 @@
+# Kubernetes Logging and Monitoring Commands Cheat Sheet
+
+This cheat sheet provides essential `kubectl` commands for viewing logs and basic monitoring within a Kubernetes cluster.
+
+---
+
+## 🔹 Logging Commands
+
+### 1. View Logs of a Pod
+```bash
+kubectl logs <pod-name>
+```
+Displays logs from the main container in the specified pod.
+
+---
+
+### 2. View Logs of a Pod with Multiple Containers
+```bash
+kubectl logs <pod-name> -c <container-name>
+```
+If a pod has more than one container, you must specify the container name.
+
+---
+
+### 3. View Logs with Continuous Updates (Follow)
+```bash
+kubectl logs -f <pod-name>
+```
+Streams logs in real time (like `tail -f`).
+
+---
+
+### 4. View Logs from a Previous Instance of a Pod (After a Crash)
+```bash
+kubectl logs --previous <pod-name>
+```
+Retrieves logs from the last terminated container.
+
+---
+
+### 5. View Logs in a Specific Namespace
+```bash
+kubectl logs <pod-name> -n <namespace>
+```
+Fetches logs from the specified namespace.
+
+---
+
+### 6. Tail the Last N Lines of Logs
+```bash
+kubectl logs --tail=100 <pod-name>
+```
+Displays the last 100 lines of logs.
+
+---
+
+### 7. Combine Follow and Tail for a Container
+```bash
+kubectl logs -f --tail=100 <pod-name> -c <container-name>
+```
+Streams the last 100 lines from a specified container.
+
+---
+
+## 🔹 Monitoring Commands
+
+### 1. View Cluster Information
+```bash
+kubectl cluster-info
+```
+Displays the cluster's master and services.
+
+---
+
+### 2. Get Nodes and Their Status
+```bash
+kubectl get nodes
+```
+Lists all nodes and their statuses.
+
+---
+
+### 3. Describe a Node
+```bash
+kubectl describe node <node-name>
+```
+Shows detailed information about a node, including resource usage and conditions.
+
+---
+
+### 4. View Resource Usage (with Metrics Server)
+```bash
+kubectl top nodes
+kubectl top pods
+```
+Displays CPU and memory usage for nodes and pods. Requires metrics server to be installed.
+
+---
+
+### 5. Get All Resources in a Namespace
+```bash
+kubectl get all -n <namespace>
+```
+Lists all resources (pods, services, deployments, etc.) in a namespace.
+
+---
+
+### 6. Watch Resource Changes Live
+```bash
+kubectl get pods -w
+```
+Watches for real-time updates to pod statuses.
+
+---
+
+### 7. View Events in a Namespace
+```bash
+kubectl get events -n <namespace> --sort-by=.metadata.creationTimestamp
+```
+Displays Kubernetes events sorted by time.
+
+---
+
+✅ Pro Tip: For advanced logging across all pods, consider using tools like:
+- `stern`
+- `kubetail`
+- `Fluentd + Elasticsearch + Kibana (EFK)`
+- `Loki + Grafana`

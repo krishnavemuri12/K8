@@ -1,0 +1,14 @@
+kubectl label pod <pod-name> <label-key>=<label-value> # to add label to a pod
+
+kubectl label pod <pod-name> <label-key>- # to remove label from a pod
+
+#to add labels to existing pods with label key and value
+kubectl label pods -l <label-key>=<label-value> <label-key>=<label-value>
+
+# -l or --selector flag is used to filter resources by label selector
+
+# to add annotation to a pod
+kubectl annotate pod <pod-name> <annotation-key>="<annotation-value>"
+
+# to add annotation to a existing pod with label key and value
+kubectl annotate pods -l <label-key>=<label-value> <annotation-key>="<annotation-value>"
